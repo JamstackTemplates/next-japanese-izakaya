@@ -1,0 +1,10 @@
+{
+  "name": "Izakaya Tsukiakari",
+  "description": "A neighbourhood izakaya in Seattle's Chinatown–International District: yakitori from the grill, small plates, a long sake list and ten counter seats. Hours, menu and how to find us.",
+  "domain": "next-japanese-izakaya.jamstacks.net",
+  "timeZone": "America/Los_Angeles",
+  "jamstacks": {
+    "siteId": "",
+    "cdnUrl": "https://cdn.jamstacks.net"
+  }
+}

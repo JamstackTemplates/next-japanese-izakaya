@@ -1,0 +1,876 @@
+/* Izakaya Tsukiakari styles: Tailwind CSS v4 plus this template's customizations.
+   Components use Tailwind utility classes; this file holds what utilities can't:
+   1. colour tokens for light/dark   2. the Tailwind theme built from them
+   3. base element styles           4. shared building blocks (.button, .washi, .wall, .noren, ...)
+   5. illustrations and animation   6. stateful pieces styled by data attributes */
+@import 'tailwindcss';
+
+/* `dark:` follows the jamstacks theme toggle (html.dark). Prefer colour tokens instead. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ------------------------------------------------------------------
+   1. Colour tokens. Change the palette here.
+   Light mode is "washi and indigo"; dark mode is "the alley after dark", lit by one red lantern.
+   Every colour that changes with the theme is a variable here, so components use
+   utilities like `bg-paper text-ink` and never need `dark:` variants.
+   ------------------------------------------------------------------ */
+:root {
+  /* Paper, ink and lines */
+  --bg: #f3eee3;
+  --paper: #faf6ec;
+  --paper-2: #f1eadb;
+  --paper-edge: #ddd1bb;
+  --text: #1c1a19;
+  --muted: #5a5048;
+  --line: #d8ccb6;
+
+  /* The wooden wall (hinoki) and the text written straight on it */
+  --wall: #d8b98a;
+  --wall-2: #d2b17f;
+  --wall-seam: rgba(96, 62, 28, .22);
+  --wall-grain: rgba(110, 70, 30, .10);
+  --wall-ink: #1c1a19;
+  --wall-muted: #4a3a29;
+
+  /* Hanging menu tags and the rail */
+  --tag: #f0e0bf;
+  --tag-2: #e6d0a6;
+  --tag-edge: #b88e58;
+  --tag-ink: #1c1a19;
+  --tag-shadow: rgba(70, 40, 10, .30);
+  --tag-back: #b48a56;
+  --tag-back-ink: #3a2714;
+  --rail: #6a4529;
+  --rail-top: #8f6340;
+  --string: #6b5640;
+  --pin: #c2412d;
+
+  /* Indigo cloth (noren), the accent for buttons and links */
+  --indigo: #22385c;
+  --indigo-deep: #16263f;
+  --indigo-weave: rgba(255, 255, 255, .05);
+  --indigo-sheen: rgba(255, 255, 255, .06);
+  --noren-dye: #f1e9d8;
+  --on-indigo: #f3eee3;
+  --on-indigo-muted: #c9cfdb;
+  --accent: #22385c;
+  --accent-strong: #16263f;
+  --accent-text: #22385c;
+  --on-accent: #ffffff;
+
+  /* Vermilion: hanko stamps and osusume marks only (and the lantern) */
+  --shu: #c2412d;
+  --shu-text: #8f2a1b;
+  --on-shu: #ffffff;
+
+  /* The room behind the noren */
+  --room-1: #f6d79c;
+  --room-2: #e3a65a;
+  --room-3: #9a5a2b;
+  --room-shelf: rgba(80, 45, 20, .55);
+  --room-bottle: rgba(80, 45, 20, .45);
+  --facade: #3b2a1e;
+  --facade-2: #2e2017;
+
+  /* The chōchin lantern: drawn in both modes, lit after dark */
+  --lantern: #c2412d;
+  --lantern-ink: #1c1a19;
+  --lantern-rib: rgba(0, 0, 0, .18);
+  --lantern-cap: #1c1a19;
+  --lantern-glow: #e0533d;
+  --lantern-glow-opacity: 0;
+
+  /* Skewer drawings */
+  --stick: #e4c792;
+  --stick-dark: #b48d55;
+  --sk-meat: #cf9459;
+  --sk-meat-dark: #8b5527;
+  --sk-negi: #eef0d2;
+  --sk-negi-core: #b7cd78;
+  --sk-tsukune: #a9693c;
+  --sk-skin: #e5b77d;
+  --sk-skin-fold: #a86f37;
+  --sk-heart: #93402c;
+  --sk-heart-fat: #f1dfc5;
+  --sk-shiitake: #74492b;
+  --sk-shiitake-cut: #e2c393;
+  --sk-shishito: #5f8f3a;
+  --sk-shishito-stem: #7a6838;
+  --sk-fat: #f5e6d0;
+  --sk-asparagus: #7ea24a;
+  --sk-egg: #f7eedb;
+  --tare: #5c2408;
+  --salt: #ffffff;
+
+  /* Robata grill, smoke and sake art */
+  --grill: #2b2523;
+  --grill-edge: #4a403b;
+  --ember: #e86a33;
+  --ember-glow: #ffb15a;
+  --smoke: rgba(90, 80, 70, .28);
+  --ceramic: #f4efe4;
+  --ceramic-shade: #d9cfbd;
+  --cold: #3d6aa8;
+  --hot: #c2412d;
+  --straw: #d8c08c;
+  --straw-dark: #a98a52;
+
+  /* Google Maps embed: untouched in light mode */
+  --map-filter: none;
+
+  --elev-1: 0 1px 2px rgba(60, 35, 10, .10), 0 4px 10px rgba(60, 35, 10, .08);
+  --elev-2: 0 2px 4px rgba(60, 35, 10, .08), 0 22px 40px -18px rgba(60, 35, 10, .45);
+  --texture-opacity: .55;
+
+  --measure: 38rem;
+  --page: 76rem;
+  --gutter: clamp(1rem, 4.5vw, 2.75rem);
+  --space-section: clamp(3.5rem, 7vw, 6rem);
+  --header-h: 3.5rem;
+  --toolbar-h: 0px;
+
+  /* --------------------------------------------------------------
+     Jamstacks component fallbacks (inherited by hosted components).
+     Published portal themes may override these on the host element.
+     Never style the component's shadow-root internals directly.
+     -------------------------------------------------------------- */
+  --jamstacks-font-family: var(--font-sans);
+  --jamstacks-font-size: 16px;
+  --jamstacks-color-primary: #22385c;
+  --jamstacks-color-background: var(--paper);
+  --jamstacks-color-text: var(--text);
+  --jamstacks-color-muted: var(--muted);
+  --jamstacks-color-border: var(--line);
+  --jamstacks-color-danger: #a8321f;
+  --jamstacks-color-success: #2f6b3e;
+  --jamstacks-border-radius: var(--radius-ui);
+  --jamstacks-control-height: 48px;
+  --jamstacks-spacing: 14px;
+  /* Component extension supported by the current support-form runtime: fill the page column. */
+  --jamstacks-form-max-width: 100%;
+
+  /* Shared theme toggle (jamstacks package): it sits on the indigo header in both modes. */
+  --jamstacks-toggle-color: #f3eee3;
+  --jamstacks-toggle-dark-color: #efe5d3;
+  --jamstacks-toggle-border: rgba(243, 238, 227, .35);
+  --jamstacks-toggle-background: transparent;
+  --jamstacks-toggle-dark-background: transparent;
+
+  color-scheme: light;
+}
+
+/* Explicit choices override the device; the media fallback also works without JavaScript.
+   Keep these two blocks identical. */
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    color-scheme: dark;
+    --bg: #0f0e0e;
+    --paper: #24201c;
+    --paper-2: #2c2722;
+    --paper-edge: #3c342c;
+    --text: #efe5d3;
+    --muted: #bdb09e;
+    --line: #3d342c;
+
+    --wall: #1d1917;
+    --wall-2: #1a1614;
+    --wall-seam: rgba(0, 0, 0, .55);
+    --wall-grain: rgba(255, 225, 190, .035);
+    --wall-ink: #efe5d3;
+    --wall-muted: #c2b4a0;
+
+    --tag: #3b2d22;
+    --tag-2: #33271e;
+    --tag-edge: #1c140e;
+    --tag-ink: #efe5d3;
+    --tag-shadow: rgba(0, 0, 0, .55);
+    --tag-back: #2a1f18;
+    --tag-back-ink: #c9b8a1;
+    --rail: #0d0a08;
+    --rail-top: #2a1f17;
+    --string: #6d5c49;
+    --pin: #d9503a;
+
+    --indigo: #1f3354;
+    --indigo-deep: #121e33;
+    --indigo-weave: rgba(255, 255, 255, .035);
+    --indigo-sheen: rgba(255, 170, 110, .10);
+    --noren-dye: #e9dfcb;
+    --on-indigo: #efe5d3;
+    --on-indigo-muted: #b9bfcc;
+    --accent: #2c4a7a;
+    --accent-strong: #1f3354;
+    --accent-text: #f07a5f;
+    --on-accent: #ffffff;
+
+    --shu: #d9503a;
+    --shu-text: #f07a5f;
+    --on-shu: #ffffff;
+
+    --room-1: #f0b25e;
+    --room-2: #b8622b;
+    --room-3: #4a2210;
+    --room-shelf: rgba(20, 8, 2, .6);
+    --room-bottle: rgba(20, 8, 2, .55);
+    --facade: #151110;
+    --facade-2: #0f0c0b;
+
+    --lantern: #e0533d;
+    --lantern-ink: #2a0d07;
+    --lantern-rib: rgba(90, 20, 5, .35);
+    --lantern-cap: #0d0a08;
+    --lantern-glow: #e0533d;
+    --lantern-glow-opacity: 1;
+
+    --stick: #b99a66;
+    --stick-dark: #7f6440;
+    --sk-meat: #bd8350;
+    --sk-meat-dark: #6e401c;
+    --sk-negi: #d9dcbc;
+    --sk-negi-core: #9db463;
+    --sk-tsukune: #94592f;
+    --sk-skin: #cf9f66;
+    --sk-skin-fold: #8a5928;
+    --sk-heart: #8a3a27;
+    --sk-heart-fat: #ddc9ad;
+    --sk-shiitake: #5e3a22;
+    --sk-shiitake-cut: #cfb183;
+    --sk-shishito: #568236;
+    --sk-shishito-stem: #6c5c31;
+    --sk-fat: #e5d5bd;
+    --sk-asparagus: #739645;
+    --sk-egg: #e9dfc9;
+    --tare: #3e1604;
+    --salt: #fffaf0;
+
+    --grill: #0d0b0a;
+    --grill-edge: #3a312c;
+    --ember: #ff7a3c;
+    --ember-glow: #ffb15a;
+    --smoke: rgba(230, 215, 200, .16);
+    --ceramic: #ddd3c2;
+    --ceramic-shade: #a99d8a;
+    --cold: #7aa2db;
+    --hot: #f07a5f;
+    --straw: #8f7a52;
+    --straw-dark: #67573a;
+
+    --map-filter: invert(.9) hue-rotate(180deg) saturate(.55) brightness(.85) contrast(.9) sepia(.15);
+
+    --elev-1: 0 1px 2px rgba(0, 0, 0, .4), 0 4px 12px rgba(0, 0, 0, .3);
+    --elev-2: 0 2px 4px rgba(0, 0, 0, .35), 0 26px 50px -18px rgba(0, 0, 0, .8);
+    --texture-opacity: .16;
+
+    /* The hosted form draws white button text, so its primary stays the dark indigo. */
+    --jamstacks-color-primary: #2c4a7a;
+    --jamstacks-color-danger: #ff9b88;
+    --jamstacks-color-success: #9fd0a6;
+  }
+}
+
+:root.dark {
+  color-scheme: dark;
+  --bg: #0f0e0e;
+  --paper: #24201c;
+  --paper-2: #2c2722;
+  --paper-edge: #3c342c;
+  --text: #efe5d3;
+  --muted: #bdb09e;
+  --line: #3d342c;
+
+  --wall: #1d1917;
+  --wall-2: #1a1614;
+  --wall-seam: rgba(0, 0, 0, .55);
+  --wall-grain: rgba(255, 225, 190, .035);
+  --wall-ink: #efe5d3;
+  --wall-muted: #c2b4a0;
+
+  --tag: #3b2d22;
+  --tag-2: #33271e;
+  --tag-edge: #1c140e;
+  --tag-ink: #efe5d3;
+  --tag-shadow: rgba(0, 0, 0, .55);
+  --tag-back: #2a1f18;
+  --tag-back-ink: #c9b8a1;
+  --rail: #0d0a08;
+  --rail-top: #2a1f17;
+  --string: #6d5c49;
+  --pin: #d9503a;
+
+  --indigo: #1f3354;
+  --indigo-deep: #121e33;
+  --indigo-weave: rgba(255, 255, 255, .035);
+  --indigo-sheen: rgba(255, 170, 110, .10);
+  --noren-dye: #e9dfcb;
+  --on-indigo: #efe5d3;
+  --on-indigo-muted: #b9bfcc;
+  --accent: #2c4a7a;
+  --accent-strong: #1f3354;
+  --accent-text: #f07a5f;
+  --on-accent: #ffffff;
+
+  --shu: #d9503a;
+  --shu-text: #f07a5f;
+  --on-shu: #ffffff;
+
+  --room-1: #f0b25e;
+  --room-2: #b8622b;
+  --room-3: #4a2210;
+  --room-shelf: rgba(20, 8, 2, .6);
+  --room-bottle: rgba(20, 8, 2, .55);
+  --facade: #151110;
+  --facade-2: #0f0c0b;
+
+  --lantern: #e0533d;
+  --lantern-ink: #2a0d07;
+  --lantern-rib: rgba(90, 20, 5, .35);
+  --lantern-cap: #0d0a08;
+  --lantern-glow: #e0533d;
+  --lantern-glow-opacity: 1;
+
+  --stick: #b99a66;
+  --stick-dark: #7f6440;
+  --sk-meat: #bd8350;
+  --sk-meat-dark: #6e401c;
+  --sk-negi: #d9dcbc;
+  --sk-negi-core: #9db463;
+  --sk-tsukune: #94592f;
+  --sk-skin: #cf9f66;
+  --sk-skin-fold: #8a5928;
+  --sk-heart: #8a3a27;
+  --sk-heart-fat: #ddc9ad;
+  --sk-shiitake: #5e3a22;
+  --sk-shiitake-cut: #cfb183;
+  --sk-shishito: #568236;
+  --sk-shishito-stem: #6c5c31;
+  --sk-fat: #e5d5bd;
+  --sk-asparagus: #739645;
+  --sk-egg: #e9dfc9;
+  --tare: #3e1604;
+  --salt: #fffaf0;
+
+  --grill: #0d0b0a;
+  --grill-edge: #3a312c;
+  --ember: #ff7a3c;
+  --ember-glow: #ffb15a;
+  --smoke: rgba(230, 215, 200, .16);
+  --ceramic: #ddd3c2;
+  --ceramic-shade: #a99d8a;
+  --cold: #7aa2db;
+  --hot: #f07a5f;
+  --straw: #8f7a52;
+  --straw-dark: #67573a;
+
+  --map-filter: invert(.9) hue-rotate(180deg) saturate(.55) brightness(.85) contrast(.9) sepia(.15);
+
+  --elev-1: 0 1px 2px rgba(0, 0, 0, .4), 0 4px 12px rgba(0, 0, 0, .3);
+  --elev-2: 0 2px 4px rgba(0, 0, 0, .35), 0 26px 50px -18px rgba(0, 0, 0, .8);
+  --texture-opacity: .16;
+
+  /* The hosted form draws white button text, so its primary stays the dark indigo. */
+  --jamstacks-color-primary: #2c4a7a;
+  --jamstacks-color-danger: #ff9b88;
+  --jamstacks-color-success: #9fd0a6;
+}
+
+/* The menu page's sticky toolbar: anchors land below it too. Unlayered, so it beats :root above. */
+html:has(.menu-toolbar) { --toolbar-h: 6.4rem; }
+
+/* ------------------------------------------------------------------
+   2. Tailwind theme. Only this template's palette exists: Tailwind's default colours
+   are switched off so new UI can't drift into a generic look.
+   ------------------------------------------------------------------ */
+@theme {
+  --color-*: initial;
+  --breakpoint-xs: 25rem;
+  --breakpoint-sm: 40rem;
+  --breakpoint-md: 48rem;
+  --breakpoint-lg: 62rem;
+  --breakpoint-xl: 80rem;
+}
+
+@theme static {
+  --font-sans: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mincho: "Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", Georgia, serif;
+  --font-brush: "Yuji Syuku", "Shippori Mincho", "Hiragino Mincho ProN", serif;
+  --radius-ui: 4px;
+  --radius-sheet: 3px;
+}
+
+@theme inline {
+  --color-white: #fff;
+  --color-bg: var(--bg);
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-paper-edge: var(--paper-edge);
+  --color-ink: var(--text);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-wall: var(--wall);
+  --color-wall-ink: var(--wall-ink);
+  --color-wall-muted: var(--wall-muted);
+  --color-tag: var(--tag);
+  --color-tag-ink: var(--tag-ink);
+  --color-indigo: var(--indigo);
+  --color-indigo-deep: var(--indigo-deep);
+  --color-on-indigo: var(--on-indigo);
+  --color-on-indigo-muted: var(--on-indigo-muted);
+  --color-noren-dye: var(--noren-dye);
+  --color-accent: var(--accent);
+  --color-accent-text: var(--accent-text);
+  --color-on-accent: var(--on-accent);
+  --color-shu: var(--shu);
+  /* Vermilion for small text on wood and paper (passes contrast where --shu doesn't). */
+  --color-shu-text: var(--shu-text);
+  --color-on-shu: var(--on-shu);
+  --color-cold: var(--cold);
+  --color-hot: var(--hot);
+  --shadow-sheet: var(--elev-1);
+  --shadow-lift: var(--elev-2);
+}
+
+/* Layout helpers used across pages. */
+@utility wrap {
+  width: min(100% - 2 * var(--gutter), var(--page));
+  margin-inline: auto;
+}
+@utility section-y {
+  padding-block: var(--space-section);
+}
+@utility vertical {
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+}
+@utility tabular {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* ------------------------------------------------------------------
+   3. Base elements
+   ------------------------------------------------------------------ */
+@layer base {
+  html { background: var(--bg); scroll-padding-top: calc(var(--header-h) + var(--toolbar-h) + .75rem); }
+  body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: 1.0625rem;
+    line-height: 1.7;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+  main { flex: 1; outline: none; }
+  h1, h2, h3 { font-family: var(--font-mincho); font-weight: 700; line-height: 1.2; letter-spacing: .005em; text-wrap: balance; }
+  p { text-wrap: pretty; }
+  abbr[title] { text-decoration: none; }
+  [lang="ja"] { letter-spacing: .04em; }
+  :focus-visible { outline: 3px solid var(--shu); outline-offset: 3px; border-radius: 2px; }
+  ::selection { background: var(--indigo); color: var(--on-indigo); }
+  @media (width < 40rem) {
+    body { font-size: 1rem; }
+  }
+}
+
+/* ------------------------------------------------------------------
+   4. Shared building blocks. Reuse these instead of restyling each instance.
+   ------------------------------------------------------------------ */
+@layer components {
+  /* Indigo cloth buttons; the ghost variant is for wood and paper. */
+  .button {
+    display: inline-flex; align-items: center; justify-content: center; gap: .55rem;
+    min-height: 3rem; padding: .65rem 1.35rem;
+    border: 0; border-radius: var(--radius-ui);
+    background:
+      repeating-linear-gradient(90deg, var(--indigo-weave) 0 1px, transparent 1px 3px),
+      var(--accent);
+    color: var(--on-accent);
+    font: inherit; font-weight: 700; letter-spacing: .02em; text-decoration: none; cursor: pointer;
+    box-shadow: inset 0 -3px 0 rgba(0, 0, 0, .25), var(--elev-1);
+    transition: transform .15s ease, background-color .15s ease;
+  }
+  .button:hover { transform: translateY(-1px); background-color: var(--accent-strong); }
+  .button-ghost {
+    background: transparent; color: var(--wall-ink);
+    box-shadow: inset 0 0 0 2px currentColor;
+  }
+  .button-ghost:hover { background: color-mix(in srgb, var(--wall-ink) 8%, transparent); }
+  .button-quiet { min-height: 2.5rem; padding: .35rem .95rem; background: transparent; color: var(--text); box-shadow: inset 0 0 0 1.5px var(--line); font-weight: 700; }
+  .button-quiet:hover { transform: none; box-shadow: inset 0 0 0 1.5px var(--text); }
+
+  .text-link {
+    color: var(--accent-text); font-weight: 700;
+    text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: .22em;
+    text-decoration-color: color-mix(in srgb, var(--accent-text) 45%, transparent);
+  }
+  .text-link:hover { text-decoration-color: currentColor; }
+
+  /* Small label above a heading, with a Japanese word. */
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: .6rem;
+    font-size: .8rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase;
+  }
+
+  /* The wooden wall: vertical hinoki planks (yakisugi after dark); the grain is a separate layer. */
+  .wall {
+    position: relative; isolation: isolate;
+    background:
+      repeating-linear-gradient(90deg, transparent 0 calc(11rem - 1px), var(--wall-seam) calc(11rem - 1px) 11rem),
+      repeating-linear-gradient(90deg, var(--wall) 0 11rem, var(--wall-2) 11rem 22rem, color-mix(in srgb, var(--wall) 60%, var(--wall-2)) 22rem 33rem);
+    color: var(--wall-ink);
+  }
+  /* Straight-grain hinoki: fine vertical lines at uneven spacings, seamless at any height. */
+  .wall::after {
+    content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+    background:
+      repeating-linear-gradient(90deg, transparent 0 13px, var(--wall-grain) 13px 14px, transparent 14px 31px, var(--wall-grain) 31px 32.5px, transparent 32.5px 47px),
+      repeating-linear-gradient(90deg, transparent 0 7px, var(--wall-grain) 7px 7.6px, transparent 7.6px 23px, var(--wall-grain) 23px 24px, transparent 24px 61px),
+      repeating-linear-gradient(90deg, transparent 0 89px, var(--wall-grain) 89px 92px, transparent 92px 176px);
+  }
+
+  /* Washi paper sheets pinned to the wall: narrow, calm, with a faint fibre texture. */
+  .washi {
+    position: relative; isolation: isolate;
+    padding: clamp(1.5rem, 4vw, 2.75rem) clamp(1.25rem, 4vw, 2.75rem);
+    border-radius: var(--radius-sheet);
+    background: var(--paper);
+    color: var(--text);
+    box-shadow: 0 1px 0 var(--paper-edge), var(--elev-2);
+  }
+  .washi::before {
+    content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none;
+    opacity: var(--texture-opacity);
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.035 .5' numOctaves='3' seed='9' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .55 0 0 0 0 .48 0 0 0 0 .38 0 0 0 .9 -.42'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E");
+  }
+  /* Two pins at the top corners. */
+  .washi::after {
+    content: ""; position: absolute; top: .7rem; left: .8rem; right: .8rem; height: .7rem; pointer-events: none;
+    background:
+      radial-gradient(circle at .35rem .35rem, color-mix(in srgb, white 45%, var(--pin)) 0 .1rem, var(--pin) .12rem .3rem, rgba(0, 0, 0, .25) .32rem, transparent .4rem) left / .8rem .8rem no-repeat,
+      radial-gradient(circle at .35rem .35rem, color-mix(in srgb, white 45%, var(--pin)) 0 .1rem, var(--pin) .12rem .3rem, rgba(0, 0, 0, .25) .32rem, transparent .4rem) right / .8rem .8rem no-repeat;
+  }
+  .washi-plain::after { display: none; }
+
+  /* Indigo noren cloth: a fine weave, a soft sheen and a lighter dyed hem. */
+  .cloth {
+    background:
+      linear-gradient(180deg, transparent 0 82%, color-mix(in srgb, var(--indigo) 82%, var(--noren-dye)) 82% 84%, transparent 84%),
+      repeating-linear-gradient(0deg, var(--indigo-weave) 0 1px, transparent 1px 3px),
+      repeating-linear-gradient(90deg, var(--indigo-weave) 0 1px, transparent 1px 4px),
+      linear-gradient(100deg, transparent 20%, var(--indigo-sheen) 45%, transparent 70%),
+      linear-gradient(180deg, var(--indigo-deep), var(--indigo) 14%, var(--indigo) 86%, color-mix(in srgb, var(--indigo) 70%, black));
+    color: var(--noren-dye);
+  }
+
+  /* The wooden rod a noren hangs from. */
+  .noren-rod {
+    height: 12px; border-radius: 6px;
+    background: linear-gradient(180deg, var(--rail-top), var(--rail) 70%);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, .3);
+  }
+
+  /* A hanko stamp: vermilion seal, slightly uneven. */
+  .hanko {
+    display: inline-grid; place-items: center; flex: none;
+    width: var(--hanko-size, 2.6rem); height: var(--hanko-size, 2.6rem);
+    border-radius: 50%;
+    border: 2px solid var(--shu); color: var(--shu);
+    box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--shu) 0%, transparent), inset 0 0 0 3.5px var(--paper-2), inset 0 0 0 5px var(--shu);
+    font-family: var(--font-mincho); font-weight: 700; line-height: 1;
+    transform: rotate(-8deg);
+  }
+  .hanko-solid { background: var(--shu); color: var(--on-shu); box-shadow: inset 0 0 0 3px color-mix(in srgb, var(--on-shu) 85%, transparent); border-color: var(--shu); }
+  .hanko-square { border-radius: 4px; }
+
+  /* Diet marks under each tag. */
+  .mark {
+    display: inline-grid; place-items: center; min-width: 1.6rem; height: 1.35rem; padding: 0 .3rem;
+    border: 1.5px solid currentColor; border-radius: 3px;
+    font-size: .68rem; font-weight: 700; letter-spacing: .04em; cursor: help;
+  }
+
+  /* Toggle chips (filters, temperature steps). */
+  .chip {
+    display: inline-flex; align-items: center; gap: .4rem;
+    min-height: 2.4rem; padding: .3rem .9rem;
+    border: 1.5px solid currentColor; border-radius: var(--radius-ui);
+    background: transparent; color: inherit;
+    font: inherit; font-size: .9rem; font-weight: 700; white-space: nowrap; cursor: pointer;
+  }
+  .chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+  .chip[aria-pressed="true"]::before { content: "✓"; }
+}
+
+/* ------------------------------------------------------------------
+   5. Illustrations and animation (SVG art is coloured by the tokens above)
+   ------------------------------------------------------------------ */
+@layer components {
+  /* --- The header: a short noren strip with split panels --- */
+  .site-header :focus-visible, .site-footer :focus-visible { outline-color: var(--noren-dye); }
+  /* The footer noren is split into three panels at the top. */
+  .footer-slits {
+    background: linear-gradient(90deg, transparent calc(33.33% - 2px), var(--bg) calc(33.33% - 2px) calc(33.33% + 2px), transparent calc(33.33% + 2px) calc(66.66% - 2px), var(--bg) calc(66.66% - 2px) calc(66.66% + 2px), transparent calc(66.66% + 2px));
+  }
+
+  /* --- The noren hero --- */
+  .noren-hero { position: relative; overflow: hidden; background: linear-gradient(180deg, var(--facade-2), var(--facade)); }
+  .noren-room {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(60% 75% at 50% 30%, var(--room-1), var(--room-2) 55%, var(--room-3) 100%);
+  }
+  .noren-room svg { position: absolute; inset: auto 0 0; width: 100%; height: 100%; }
+  .noren-room__shelf { fill: var(--room-shelf); }
+  .noren-room__bottle { fill: var(--room-bottle); }
+  .noren-panels {
+    position: relative; display: grid; grid-template-columns: repeat(var(--panels, 4), 1fr); gap: var(--slit, 6px);
+    width: min(100%, 64rem); margin-inline: auto; height: 100%;
+  }
+  .noren-panel {
+    position: relative; overflow: hidden;
+    transform-origin: 50% 0;
+    border-radius: 0 0 3px 3px;
+    box-shadow: 0 18px 30px -12px rgba(0, 0, 0, .55), inset 0 10px 14px -10px rgba(0, 0, 0, .5);
+    animation: noren-part 2.6s cubic-bezier(.3, .7, .2, 1) .25s both;
+    transition: translate .6s cubic-bezier(.3, .7, .2, 1), rotate .6s cubic-bezier(.3, .7, .2, 1);
+  }
+  .noren-panel:nth-child(1) { --part-x: -10px; --part-r: .8deg; }
+  .noren-panel:nth-child(2) { --part-x: -4px; --part-r: .3deg; }
+  .noren-panel:nth-child(3) { --part-x: 4px; --part-r: -.3deg; }
+  .noren-panel:nth-child(4) { --part-x: 10px; --part-r: -.8deg; }
+  .noren-panel:nth-child(5) { --part-x: 14px; --part-r: -1deg; }
+  .noren-hero:hover .noren-panel { translate: calc(var(--part-x) * 1.8) 0; rotate: calc(var(--part-r) * 1.6); }
+  .noren-char { font-family: var(--font-brush); line-height: 1; color: var(--noren-dye); text-shadow: 0 0 1px color-mix(in srgb, var(--noren-dye) 60%, transparent); opacity: .96; }
+  /* The romanised name runs across every panel; each panel shows its slice, so it parts with the cloth. */
+  .noren-line { position: absolute; left: calc(var(--i) * -100% - var(--i) * var(--slit, 6px)); width: calc(var(--panels, 4) * 100% + (var(--panels, 4) - 1) * var(--slit, 6px)); text-align: center; }
+  .noren-crest { border: 2px solid currentColor; border-radius: 50%; display: grid; place-items: center; }
+
+  @keyframes noren-part {
+    0% { transform: translateX(0) rotate(0); }
+    45% { transform: translateX(calc(var(--part-x) * 1.6)) rotate(calc(var(--part-r) * 2.2)); }
+    70% { transform: translateX(calc(var(--part-x) * .8)) rotate(calc(var(--part-r) * -.6)); }
+    100% { transform: translateX(var(--part-x)) rotate(var(--part-r)); }
+  }
+
+  /* --- The lantern --- */
+  .lantern { overflow: visible; }
+  .lantern__body { fill: var(--lantern); }
+  .lantern__rib { stroke: var(--lantern-rib); fill: none; }
+  .lantern__cap { fill: var(--lantern-cap); }
+  .lantern__ink { fill: var(--lantern-ink); font-family: var(--font-mincho); font-weight: 700; }
+  .lantern__light { fill: var(--room-1); opacity: calc(var(--lantern-glow-opacity) * .55); }
+  .lantern-sway { transform-origin: 50% 0; animation: sway 7s ease-in-out infinite; }
+  .lantern-glow {
+    position: absolute; pointer-events: none; border-radius: 50%;
+    background: radial-gradient(circle, color-mix(in srgb, var(--lantern-glow) 55%, transparent), color-mix(in srgb, var(--lantern-glow) 18%, transparent) 40%, transparent 70%);
+    opacity: calc(var(--lantern-glow-opacity) * .85);
+    animation: breathe 5s ease-in-out infinite;
+  }
+  /* Light pooling across the top of the wall after dark. */
+  .wall-glow::before {
+    content: ""; position: absolute; inset: 0 0 auto; z-index: -1; height: 38rem; pointer-events: none;
+    background: radial-gradient(52rem 26rem at 88% 0%, color-mix(in srgb, var(--lantern-glow) 22%, transparent), transparent 70%);
+    opacity: var(--lantern-glow-opacity);
+    animation: breathe 5s ease-in-out infinite;
+  }
+
+  /* --- Split-noren section dividers --- */
+  .divider-noren { display: grid; grid-template-columns: repeat(var(--panels, 3), 1fr); gap: 4px; width: var(--w, 15rem); height: 4.25rem; }
+  .divider-noren > span { position: relative; overflow: hidden; border-radius: 0 0 2px 2px; box-shadow: 0 8px 14px -8px rgba(0, 0, 0, .55); transform-origin: 50% 0; }
+  .divider-noren > span:nth-child(odd) { rotate: .6deg; }
+  .divider-noren > span:nth-child(even) { rotate: -.5deg; }
+
+  /* --- Menu rails and hanging tags --- */
+  .tag-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(var(--slot, 9.5rem), 1fr)); column-gap: 1rem; row-gap: 2rem; }
+  .tag-slot { position: relative; display: flex; flex-direction: column; align-items: center; padding-top: 1.75rem; text-align: center; }
+  /* Each slot draws its piece of the rail, so every wrapped row gets its own continuous rail. */
+  .tag-slot::before {
+    content: ""; position: absolute; top: 0; left: -.5rem; right: -.5rem; height: 13px;
+    background: linear-gradient(180deg, var(--rail-top), var(--rail) 75%);
+    box-shadow: 0 4px 6px -2px rgba(0, 0, 0, .35);
+  }
+  .tag-hang { position: relative; display: flex; flex-direction: column; align-items: center; transform-origin: 50% -1.1rem; transition: rotate .5s cubic-bezier(.3, .7, .2, 1.4); }
+  /* The string from the nail on the rail to the tag. */
+  .tag-hang::before {
+    content: ""; position: absolute; bottom: 100%; left: 50%; width: 1.6rem; height: 1.15rem; translate: -50% 0;
+    background: linear-gradient(to top right, transparent calc(50% - .75px), var(--string) calc(50% - .75px) calc(50% + .75px), transparent calc(50% + .75px)) left / 50% 100% no-repeat,
+      linear-gradient(to top left, transparent calc(50% - .75px), var(--string) calc(50% - .75px) calc(50% + .75px), transparent calc(50% + .75px)) right / 50% 100% no-repeat;
+  }
+  .tag-hang::after { content: ""; position: absolute; bottom: calc(100% + 1rem); left: 50%; width: 6px; height: 6px; translate: -50% 0; border-radius: 50%; background: var(--stick-dark); box-shadow: 0 1px 1px rgba(0, 0, 0, .5); }
+  .tag-slot:hover .tag-hang { rotate: 2.5deg; }
+  .tag-slot:nth-child(even):hover .tag-hang { rotate: -2.5deg; }
+  .tag {
+    position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+    width: var(--tag-w, 4.4rem); height: var(--tag-h, 13rem); padding: .85rem .35rem .55rem;
+    border-radius: 3px;
+    background:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='240'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.6 .02' numOctaves='2' seed='2'/%3E%3CfeColorMatrix values='0 0 0 0 .4 0 0 0 0 .25 0 0 0 0 .1 0 0 0 .5 -.2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E"),
+      linear-gradient(90deg, var(--tag-2), var(--tag) 30%, var(--tag) 70%, var(--tag-2));
+    background-size: 100% 100%;
+    color: var(--tag-ink);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tag-edge) 55%, transparent), 2px 6px 10px -3px var(--tag-shadow);
+  }
+  /* The hole the string passes through. */
+  .tag::before { content: ""; position: absolute; top: .3rem; left: 50%; width: 5px; height: 5px; translate: -50% 0; border-radius: 50%; background: color-mix(in srgb, var(--tag-edge) 80%, black); }
+  .tag__name { font-family: var(--font-mincho); font-weight: 700; font-size: var(--name-size, 1.5rem); line-height: 1.15; letter-spacing: .06em; max-height: calc(100% - 2.2rem); }
+  .tag__price { font-weight: 700; font-size: .82rem; letter-spacing: 0; padding-top: .35rem; border-top: 1px solid color-mix(in srgb, var(--tag-ink) 25%, transparent); width: 100%; text-align: center; }
+  .tag-back {
+    background:
+      repeating-linear-gradient(180deg, transparent 0 9px, rgba(0, 0, 0, .06) 9px 10px),
+      linear-gradient(90deg, color-mix(in srgb, var(--tag-back) 85%, black), var(--tag-back) 30%, var(--tag-back) 70%, color-mix(in srgb, var(--tag-back) 85%, black));
+    color: var(--tag-back-ink);
+  }
+  .tag-back .tag__name { font-size: 1.25rem; opacity: .85; }
+  .tag-hanko { position: absolute; right: calc(var(--hanko-size) * -1 + .45rem); top: .9rem; --hanko-size: 2.1rem; background: var(--paper); font-size: .5rem; }
+  .tag-hanko > span { writing-mode: vertical-rl; letter-spacing: 0; line-height: 1.05; }
+
+  @media (width < 40rem) {
+    .tag-row { --slot: 6.6rem; column-gap: .75rem; }
+    .tag { --tag-w: 3.6rem; --tag-h: 10.5rem; padding-top: .7rem; }
+    .tag__name { font-size: calc(var(--name-size, 1.5rem) * .72); }
+    .tag__price { font-size: .74rem; }
+    .tag-hanko { --hanko-size: 1.8rem; font-size: .44rem; }
+  }
+
+  /* --- Osusume paper strips (tanzaku) --- */
+  .strip {
+    position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+    width: 5.4rem; height: 15rem; padding: 1.3rem .5rem .8rem;
+    background: var(--paper); color: var(--text);
+    box-shadow: 0 1px 0 var(--paper-edge), 3px 8px 14px -6px rgba(0, 0, 0, .4);
+  }
+  .strip::before {
+    content: ""; position: absolute; top: .4rem; left: 50%; width: .7rem; height: .7rem; translate: -50% 0; border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, color-mix(in srgb, white 45%, var(--pin)) 0 18%, var(--pin) 22% 60%, rgba(0, 0, 0, .3) 64%, transparent 72%);
+  }
+  .strip::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none; opacity: var(--texture-opacity);
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='240'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.04 .45' numOctaves='3' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 .55 0 0 0 0 .48 0 0 0 0 .38 0 0 0 .9 -.42'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E");
+  }
+  .strip__name { font-family: var(--font-mincho); font-weight: 700; font-size: var(--name-size, 1.55rem); line-height: 1.12; letter-spacing: .05em; }
+  .strip-slot:nth-child(4n + 1) .strip { rotate: -1.5deg; }
+  .strip-slot:nth-child(4n + 2) .strip { rotate: 1deg; }
+  .strip-slot:nth-child(4n + 3) .strip { rotate: -.6deg; }
+  .strip-slot:nth-child(4n + 4) .strip { rotate: 1.6deg; }
+  @media (width < 40rem) {
+    .strip { width: 4.6rem; height: 12rem; }
+    .strip__name { font-size: calc(var(--name-size, 1.55rem) * .82); }
+  }
+
+  /* --- Skewers --- */
+  .skewer { display: block; width: 100%; height: auto; overflow: visible; }
+  .skewer__stick { stroke: var(--stick); stroke-width: 2.6; stroke-linecap: round; }
+  .skewer__handle { fill: var(--stick); stroke: var(--stick-dark); stroke-width: .8; }
+  .skewer__glaze { fill: var(--tare); opacity: .38; mix-blend-mode: multiply; }
+  .skewer__gloss { fill: none; stroke: rgba(255, 255, 255, .55); stroke-width: 1.2; stroke-linecap: round; }
+  .skewer__salt { fill: var(--salt); }
+  .skewer__char { fill: rgba(40, 20, 5, .35); }
+  .sk-meat { fill: var(--sk-meat); }
+  .sk-meat-dark { fill: none; stroke: var(--sk-meat-dark); stroke-width: 1.2; stroke-linecap: round; }
+  .sk-negi { fill: var(--sk-negi); }
+  .sk-negi-core { fill: var(--sk-negi-core); }
+  .sk-tsukune { fill: var(--sk-tsukune); }
+  .sk-skin { fill: var(--sk-skin); }
+  .sk-skin-fold { fill: none; stroke: var(--sk-skin-fold); stroke-width: 1.1; stroke-linecap: round; }
+  .sk-heart { fill: var(--sk-heart); }
+  .sk-heart-fat { fill: var(--sk-heart-fat); }
+  .sk-shiitake { fill: var(--sk-shiitake); }
+  .sk-shiitake-cut { fill: none; stroke: var(--sk-shiitake-cut); stroke-width: 1.4; stroke-linecap: round; }
+  .sk-shishito { fill: var(--sk-shishito); }
+  .sk-shishito-stem { fill: var(--sk-shishito-stem); }
+  .sk-fat { fill: var(--sk-fat); }
+  .sk-asparagus { fill: var(--sk-asparagus); }
+  .sk-egg { fill: var(--sk-egg); }
+
+  /* --- Robata grill with rising smoke --- */
+  .robata__body { fill: var(--grill); }
+  .robata__edge { fill: var(--grill-edge); }
+  .robata__ember { fill: var(--ember); }
+  .robata__glow { fill: var(--ember-glow); opacity: .5; animation: breathe 3.5s ease-in-out infinite; }
+  .robata__smoke path { fill: none; stroke: var(--smoke); stroke-width: 6; stroke-linecap: round; animation: smoke 6s ease-in infinite; }
+  .robata__smoke path:nth-child(2) { animation-delay: 2s; }
+  .robata__smoke path:nth-child(3) { animation-delay: 4s; }
+
+  /* --- Tokkuri thermometer, ochoko and the komodaru lid --- */
+  .tokkuri__body { fill: var(--ceramic); stroke: var(--ceramic-shade); stroke-width: 1.5; }
+  .tokkuri__glaze { fill: var(--indigo); }
+  .tokkuri__tube { fill: color-mix(in srgb, var(--ceramic-shade) 60%, transparent); }
+  .tokkuri__dot { fill: var(--ceramic); stroke: var(--ceramic-shade); stroke-width: 1.5; }
+  .tokkuri__tick { stroke: var(--wall-muted); stroke-width: 1.5; }
+  .ochoko { fill: var(--ceramic); stroke: var(--ceramic-shade); stroke-width: 1.2; }
+  .ochoko__sake { fill: color-mix(in srgb, var(--straw) 50%, var(--ceramic)); }
+  .komodaru__straw { fill: var(--straw); }
+  .komodaru__line { fill: none; stroke: var(--straw-dark); stroke-width: 1.4; }
+  .komodaru__rope { fill: none; stroke: var(--straw-dark); stroke-width: 5; stroke-linecap: round; }
+
+  /* Mini temperature scale on each sake. */
+  .mini-scale { display: grid; grid-template-columns: repeat(8, 1fr); gap: 2px; width: 8.5rem; height: .6rem; }
+  .mini-scale > span { border-radius: 1px; background: color-mix(in srgb, var(--muted) 22%, transparent); }
+  .mini-scale > span[data-on="true"] { background: color-mix(in srgb, var(--hot) calc(var(--t) * 100%), var(--cold)); }
+
+  /* Google Maps embed, framed as a pinned print; --map-filter turns it into a night map. */
+  .map { position: relative; overflow: hidden; min-height: 20rem; background: var(--paper-2); }
+  .map iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; filter: var(--map-filter); }
+  .print-frame { padding: .7rem .7rem 2.4rem; background: var(--paper); box-shadow: var(--elev-2); rotate: .8deg; }
+
+  @keyframes sway { 0%, 100% { rotate: -1.4deg; } 50% { rotate: 1.4deg; } }
+  @keyframes breathe { 0%, 100% { opacity: calc(var(--lantern-glow-opacity) * .85); } 50% { opacity: calc(var(--lantern-glow-opacity) * .6); } }
+  @keyframes smoke { 0% { opacity: 0; transform: translateY(10px) scaleX(.9); } 25% { opacity: 1; } 100% { opacity: 0; transform: translateY(-46px) scaleX(1.3); } }
+  @keyframes open-pulse { 50% { box-shadow: 0 0 0 7px transparent; } }
+}
+
+/* ------------------------------------------------------------------
+   6. Stateful pieces styled by attributes the components set
+   ------------------------------------------------------------------ */
+@layer components {
+  .status-dot { width: .65rem; height: .65rem; flex: none; border-radius: 50%; background: var(--wall-muted); }
+  [data-open="true"] > .status-dot { background: #4caf6a; box-shadow: 0 0 0 4px color-mix(in srgb, #4caf6a 30%, transparent); animation: open-pulse 2.4s ease-in-out infinite; }
+  [data-open="true"][data-last-order="true"] > .status-dot { background: #e0a030; box-shadow: 0 0 0 4px color-mix(in srgb, #e0a030 30%, transparent); }
+  [data-open="false"] > .status-dot { background: var(--shu); }
+
+  .tag-slot:target .tag { box-shadow: 0 0 0 3px var(--shu), 2px 6px 10px -3px var(--tag-shadow); }
+  .tag-slot:target .tag-caption h3 { text-decoration: underline 2px var(--shu); text-underline-offset: .25em; }
+  .tag-slot[data-soldout="true"] .tag-caption { opacity: .72; }
+
+  [data-dim="true"] { opacity: .32; filter: saturate(.4); transition: opacity .25s ease; }
+  button.temp-step:hover { background: color-mix(in srgb, var(--wall-ink) 6%, transparent); }
+  .temp-step[aria-pressed="true"], .temp-step[aria-pressed="true"]:hover { background: color-mix(in srgb, var(--hot) calc(var(--t) * 100%), var(--cold)); color: #fff; }
+  .temp-step[aria-pressed="true"] .temp-step__meta { color: #fff; }
+
+  .faq summary { list-style: none; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: "＋"; flex: none; color: var(--shu); font-weight: 700; transition: rotate .2s ease; }
+  .faq[open] summary::after { rotate: 45deg; }
+
+  /* Hosted Jamstacks form host (components/jamstacks-support-form.tsx). */
+  .enquiry { position: relative; padding: clamp(1rem, 3vw, 2rem); border-radius: var(--radius-sheet); background: var(--paper); color: var(--text); box-shadow: var(--elev-2); }
+  .enquiry__host { display: block; }
+  .enquiry[data-state="loading"], .enquiry[data-state="loaded"] { min-height: 34rem; outline: 2px dashed var(--paper-edge); outline-offset: -10px; }
+  .enquiry__status { padding: 1.25rem 0 0; color: var(--muted); font-size: .9875rem; }
+  .enquiry__status:empty { display: none; }
+  .enquiry[data-state="error"] .enquiry__status,
+  .enquiry[data-state="slow"] .enquiry__status { padding: 1.1rem 1.4rem; border-radius: var(--radius-ui); border-left: 4px solid var(--shu); background: var(--paper-2); color: var(--text); }
+  @media (width < 40rem) { .enquiry[data-state="loading"], .enquiry[data-state="loaded"] { min-height: 30rem; } }
+
+  .copy-status:empty { display: none; }
+  .scrollbar-none { scrollbar-width: none; }
+  .scrollbar-none::-webkit-scrollbar { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  html { scroll-behavior: auto; }
+  /* The noren simply hangs, slightly apart. */
+  .noren-panel { transform: translateX(var(--part-x)) rotate(var(--part-r)); }
+  .noren-hero:hover .noren-panel, .tag-slot:hover .tag-hang { translate: none; rotate: none; }
+}
+
+@media print {
+  body, .wall { background: #fff !important; color: #000; }
+  .site-header { position: static; }
+  .washi, .enquiry { box-shadow: none; border: 1px solid #ccc; }
+  .tag-slot { break-inside: avoid; }
+  .noren-hero, .lantern-glow, .wall-glow::before { display: none; }
+}

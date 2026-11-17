@@ -1,0 +1,22 @@
+{
+  "templateId": "next-japanese-izakaya",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "fullPage": false,
+  "captures": [
+    {
+      "mode": "light",
+      "sha256": "3647ec4eb0831c26972c601b8ea8827ab73a48ee9f6b53d85706c2a81e6dbb66",
+      "file": "jamstacks/home-light.jpg",
+      "bytes": 178472
+    },
+    {
+      "mode": "dark",
+      "sha256": "ef6558de6e3b29c0940451a099d345705198828bb14fae8836ffe48497273b33",
+      "file": "jamstacks/home-dark.jpg",
+      "bytes": 168451
+    }
+  ]
+}

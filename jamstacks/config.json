@@ -1,0 +1,19 @@
+{
+  "name": "Japanese izakaya",
+  "description": "A moody izakaya theme in sumi ink, indigo and lantern red for Japanese pubs and small-plates bars: a wall of hanging wooden menu tags, yakitori drawn skewer by skewer, today's recommendations, a sake list with a serving-temperature guide, counter seating, late hours, location and a Jamstacks contact component for group tables, omakase evenings and private hire.",
+  "tech": "next",
+  "type": "japanese",
+  "style": "izakaya",
+  "internal": false,
+  "components": [
+    "support-form"
+  ],
+  "configFile": "site.config.json",
+  "screenshots": {
+    "light": "jamstacks/home-light.jpg",
+    "dark": "jamstacks/home-dark.jpg",
+    "theme": {
+      "strategy": "media"
+    }
+  }
+}
